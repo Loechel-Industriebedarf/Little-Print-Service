@@ -15,7 +15,13 @@ namespace PrintService
         public static string printedFolder { get; set; }
         public static string printerName { get; set; }
 
-
+        /// <summary>
+        /// The main method calls a function to read the programs settings.
+        /// After that, it enters the core loop.
+        /// The core loop looks every second if a specific folder contains new files.
+        /// If there are new files, they get printed and moved to a different directory.
+        /// </summary>
+        /// <param name="args">Console args. They are not used here at the moment.</param>
         static void Main(string[] args)
         {  
            
@@ -37,11 +43,12 @@ namespace PrintService
         }
 
         /// <summary>
-        /// 
+        /// This method scans a folder for files. 
+        /// If it finds any, it prints them and moves them to a diffent directory after.
         /// </summary>
-        /// <param name="toPrintFolder"></param>
-        /// <param name="printedFolder"></param>
-        /// <param name="printerName"></param>
+        /// <param name="toPrintFolder">Folder with files that should be printed.</param>
+        /// <param name="printedFolder">After a file was printed, move it to this folder.</param>
+        /// <param name="printerName">Name of the printer, that should be used.</param>
         private static void CoreLoop(string toPrintFolder, string printedFolder, string printerName)
         {
             DirectoryInfo d = new DirectoryInfo(toPrintFolder);
@@ -70,11 +77,11 @@ namespace PrintService
         }
 
         /// <summary>
-        /// 
+        /// Reads settings from xml file.
         /// </summary>
         public static void ReadSettings()
         {
-            XDocument doc = XDocument.Load("settings.xml");
+            XDocument doc = XDocument.Load("settings.xml"); //Settings file
 
             var toPrintFolderTemp = doc.Descendants("toPrintFolder");
             var printedFolderTemp = doc.Descendants("printedFolder");
