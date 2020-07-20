@@ -14,6 +14,7 @@ namespace PrintService
         public static string toPrintFolder { get; set; }
         public static string printedFolder { get; set; }
         public static string printerName { get; set; }
+        public static int sleepTime { get; set; }
 
         /// <summary>
         /// The main method calls a function to read the programs settings.
@@ -32,7 +33,7 @@ namespace PrintService
                     try
                     {
                         CoreLoop(toPrintFolder, printedFolder, printerName); //Print all files in directory
-                        System.Threading.Thread.Sleep(1000); //Wait 1 second, then check again
+                        System.Threading.Thread.Sleep(sleepTime); //Wait x seconds, then check again
                     }
                     catch (Exception ex)
                     {
@@ -57,7 +58,7 @@ namespace PrintService
             //Loop throught files
             foreach (FileInfo file in Files)
             {
-                //Print file
+                //Print file using freespire.pdf
                 PdfDocument pdfdocument = new PdfDocument();
                 pdfdocument.LoadFromFile(file.FullName);
                 pdfdocument.PrintSettings.PrinterName = printerName;
@@ -86,10 +87,12 @@ namespace PrintService
             var toPrintFolderTemp = doc.Descendants("toPrintFolder");
             var printedFolderTemp = doc.Descendants("printedFolder");
             var printerNameTemp = doc.Descendants("printerName");
+            var sleepTimeTemp = doc.Descendants("sleepTime");
 
             foreach (var foo in toPrintFolderTemp) { toPrintFolder = foo.Value; }
             foreach (var foo in printedFolderTemp) { printedFolder = foo.Value; }
             foreach (var foo in printerNameTemp) { printerName = foo.Value; }
+            foreach (var foo in sleepTimeTemp) { sleepTime = Convert.ToInt16(foo.Value); }
         }
     }
 }
