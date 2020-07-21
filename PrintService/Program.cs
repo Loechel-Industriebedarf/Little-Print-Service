@@ -11,10 +11,11 @@ namespace PrintService
 {
     public class Program
     { 
-        public static string toPrintFolder { get; set; }
-        public static string printedFolder { get; set; }
-        public static string printerName { get; set; }
-        public static int sleepTime { get; set; }
+        public static string ToPrintFolder { get; set; }
+        public static string PrintedFolder { get; set; }
+        public static string PrinterName { get; set; }
+        public static string PrintKeyword { get; set; } //Only print, if this keyword is in the filename
+        public static int SleepTime { get; set; }
 
         /// <summary>
         /// The main method calls a function to read the programs settings.
@@ -32,8 +33,8 @@ namespace PrintService
                 {
                     try
                     {
-                        CoreLoop(toPrintFolder, printedFolder, printerName); //Print all files in directory
-                        System.Threading.Thread.Sleep(sleepTime); //Wait x seconds, then check again
+                        CoreLoop(ToPrintFolder, PrintedFolder, PrinterName); //Print all files in directory
+                        System.Threading.Thread.Sleep(SleepTime); //Wait x seconds, then check again
                     }
                     catch (Exception ex)
                     {
@@ -53,7 +54,8 @@ namespace PrintService
         private static void CoreLoop(string toPrintFolder, string printedFolder, string printerName)
         {
             DirectoryInfo d = new DirectoryInfo(toPrintFolder);
-            FileInfo[] Files = d.GetFiles("*"); //Get all files from directory
+            //Only print, if the keyword is in the filename
+            FileInfo[] Files = d.GetFiles("*" + PrintKeyword + "*"); //Get all files from directory
 
             //Loop throught files
             foreach (FileInfo file in Files)
@@ -87,12 +89,14 @@ namespace PrintService
             var toPrintFolderTemp = doc.Descendants("toPrintFolder");
             var printedFolderTemp = doc.Descendants("printedFolder");
             var printerNameTemp = doc.Descendants("printerName");
+            var printKeywordTemp = doc.Descendants("printKeyword");
             var sleepTimeTemp = doc.Descendants("sleepTime");
 
-            foreach (var foo in toPrintFolderTemp) { toPrintFolder = foo.Value; }
-            foreach (var foo in printedFolderTemp) { printedFolder = foo.Value; }
-            foreach (var foo in printerNameTemp) { printerName = foo.Value; }
-            foreach (var foo in sleepTimeTemp) { sleepTime = Convert.ToInt16(foo.Value); }
+            foreach (var foo in toPrintFolderTemp) { ToPrintFolder = foo.Value; }
+            foreach (var foo in printedFolderTemp) { PrintedFolder = foo.Value; }
+            foreach (var foo in printerNameTemp) { PrinterName = foo.Value; }
+            foreach (var foo in printKeywordTemp) { PrintKeyword = foo.Value; }
+            foreach (var foo in sleepTimeTemp) { SleepTime = Convert.ToInt16(foo.Value); }
         }
     }
 }
