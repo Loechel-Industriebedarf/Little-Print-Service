@@ -1,4 +1,5 @@
 ﻿using Spire.Pdf;
+using Spire.Pdf.Print;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -25,23 +26,21 @@ namespace PrintService
         /// </summary>
         /// <param name="args">Console args. They are not used here at the moment.</param>
         static void Main(string[] args)
-        {  
-           
-                ReadSettings();
+        {
+            ReadSettings();
 
-                while (true)
+            while (true)
+            {
+                try
                 {
-                    try
-                    {
-                        CoreLoop(ToPrintFolder, PrintedFolder, PrinterName); //Print all files in directory
-                        System.Threading.Thread.Sleep(SleepTime); //Wait x seconds, then check again
-                    }
-                    catch (Exception ex)
-                    {
-                        Console.WriteLine(ex.ToString());
-                    }
-                }    
-                
+                    CoreLoop(ToPrintFolder, PrintedFolder, PrinterName); //Print all files in directory
+                    System.Threading.Thread.Sleep(SleepTime); //Wait x seconds, then check again
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToString());
+                }
+            }      
         }
 
         /// <summary>
@@ -53,9 +52,16 @@ namespace PrintService
         /// <param name="printerName">Name of the printer, that should be used.</param>
         private static void CoreLoop(string toPrintFolder, string printedFolder, string printerName)
         {
+            string[] PrintKeywords = PrintKeyword.Split('$');
+
             DirectoryInfo d = new DirectoryInfo(toPrintFolder);
             //Only print, if the keyword is in the filename
-            FileInfo[] Files = d.GetFiles("*" + PrintKeyword + "*"); //Get all files from directory
+            List<FileInfo> Files = new List<FileInfo>();
+            foreach(string keyword in PrintKeywords)
+            {
+                Files.AddRange(d.GetFiles("*" + keyword + "*")); //Get all files from directory
+            }
+            
 
             //Loop throught files
             foreach (FileInfo file in Files)
@@ -67,6 +73,7 @@ namespace PrintService
                 pdfdocument.PrintSettings.Copies = 1;
                 pdfdocument.Print();
                 pdfdocument.Dispose();
+
 
                 string destFileName = printedFolder + "\\" + file.Name;
                 //If file already exists: Delete it
