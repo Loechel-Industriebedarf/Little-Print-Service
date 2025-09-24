@@ -71,18 +71,34 @@ namespace PrintService
                 pdfdocument.LoadFromFile(file.FullName);
                 pdfdocument.PrintSettings.PrinterName = printerName;
                 pdfdocument.PrintSettings.Copies = 1;
-                pdfdocument.Print();
-                pdfdocument.Dispose();
-
+                int pageNumber = pdfdocument.Pages.Count;
 
                 string destFileName = printedFolder + "\\" + file.Name;
+
+                //Spire pdf can only print the first 3 pages in the free version
+                //BUT it can access the first 10 pages and split them into seperate files
+                if (pageNumber <= 3)
+                {
+                    pdfdocument.Print();
+
+                    pdfdocument.Dispose();
+
+                    //Console log
+                    Console.WriteLine(DateTimeOffset.Now.ToString("dd.MM.yyyy HH:mm:ss") + ": " + file.Name + " wurde erfolgreich gedruckt.");
+                }
+                else
+                {
+                    pdfdocument.Split(file.FullName + "--Page_{0}.pdf", 1);
+                    pdfdocument.Dispose();
+
+                    //Console log
+                    Console.WriteLine(DateTimeOffset.Now.ToString("dd.MM.yyyy HH:mm:ss") + ": " + file.Name + " wurde in mehrere Teile gesplittet. (" + pageNumber.ToString() + " Seiten)");
+                }
+
                 //If file already exists: Delete it
                 if (File.Exists(destFileName)) { File.Delete(destFileName); }
                 //Move file to new folder
                 File.Move(file.FullName, printedFolder + "\\" + file.Name);
-
-                //Console log
-                Console.WriteLine(DateTimeOffset.Now.ToString("dd.MM.yyyy HH:mm:ss") + ": " + file.Name + " wurde erfolgreich gedruckt.");
             }
         }
 
